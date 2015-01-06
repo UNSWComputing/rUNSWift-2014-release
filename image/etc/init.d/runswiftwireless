@@ -1,0 +1,39 @@
+#!/sbin/runscript
+# Copyright 1999-2014 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+depend() {
+  need dbus
+}
+
+start() {
+  echo "Killing any lingering wpa_supplicant"
+  killall -q wpa_supplicant
+  ifconfig wlan0 up
+  echo "Calling wpa_supplicant on wlan0"
+  wpa_supplicant -iwlan0 -Dnl80211 -c/etc/wpa_supplicant/wpa_supplicant.conf -B
+  sleep 1
+  # Temporary. We need to set this IP address to a diff one per robot
+  # or use dhcp?
+  # ifconfig wlan0 "192.168.20.5" netmask 255.255.0.0
+  # route add -net default gw "192.168.0.1"
+  echo "Setting up wlan0 as dhcp"
+  ifconfig wlan0 dhcp
+  echo "dhclient wlan0"
+  dhclient wlan0
+  echo "Finished starting runswiftwireless"
+}
+
+stop() {
+  echo "Killing wpa_supplicant"
+  killall -q wpa_supplicant
+  echo "Taking wlan0 down"
+  ifconfig wlan0 down
+}
+
+restart() {
+  stop
+  sleep 2
+  start
+}

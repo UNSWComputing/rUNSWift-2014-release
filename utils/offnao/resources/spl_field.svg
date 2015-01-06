@@ -1,0 +1,45 @@
+<?xml version="1.0" standalone="no"?>
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="740" height="540" version="1.1"
+xmlns="http://www.w3.org/2000/svg">
+
+<!-- green carpet -->
+<rect x="0" y="0" width="740" height="540" style="fill:rgb(0,128,0);"/>
+
+<!-- field outline -->
+<rect x="67.5" y="67.5" width="605" height="405" style="fill:none; stroke-width:5; stroke:rgb(255,255,255);" />
+
+<!-- center circle -->
+<circle cx="370" cy="270" r="62.5" style="fill:none; stroke-width:5; stroke:rgb(255,255,255);" />
+
+<!-- center line -->
+<line x1="370" y1="67.5" x2="370" y2="472.5" style="stroke:rgb(255,255,255);stroke-width:5" />
+
+<!-- kick off spot -->
+<line x1="365" y1="270" x2="375" y2="270" style="stroke:rgb(255,255,255);stroke-width:5" />
+
+<!-- blue penalty spot -->
+<line x1="245" y1="270" x2="255" y2="270" style="stroke:rgb(255,255,255);stroke-width:5" />
+<line x1="250" y1="265" x2="250" y2="275" style="stroke:rgb(255,255,255);stroke-width:5" />
+
+<!-- yellow penalty spot -->
+<line x1="485" y1="270" x2="495" y2="270" style="stroke:rgb(255,255,255);stroke-width:5" />
+<line x1="490" y1="265" x2="490" y2="275" style="stroke:rgb(255,255,255);stroke-width:5" />
+
+<!-- blue goalie box -->
+<rect x="67.5" y="157.5" width="65" height="225" style="fill:none; stroke-width:5; stroke:rgb(255,255,255);" />
+
+<!-- yellow goalie box -->
+<rect x="607.5" y="157.5" width="65" height="225" style="fill:none; stroke-width:5; stroke:rgb(255,255,255);" />
+
+<!-- blue goal -->
+<line x1="67.5" y1="200" x2="67.5" y2="340" style="stroke:rgb(255,255,0);stroke-width:5" />
+<!--previously for a blue goal(0,0,255)-->
+
+<!-- yellow goal -->
+<line x1="672.5" y1="200" x2="672.5" y2="340" style="stroke:rgb(255,255,0);stroke-width:5" />
+
+</svg>

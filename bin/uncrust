@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ -x `which uncrustify` ]
+then
+   find "$1"/ '(' -path "$1/FADBAD++" -prune -o -path "$1/Eigen" -prune -o -name '*.[ch]pp' -o -name '*.tcc' ')' -a -type f| grep -vi SWIG |grep -vi vision |grep -v RobotModule | xargs uncrustify -c "$2" --no-backup
+else
+   echo "Cannot run find uncrustify executable on your PATH"
+fi

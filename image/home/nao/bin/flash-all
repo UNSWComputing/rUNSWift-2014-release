@@ -1,0 +1,21 @@
+#!/bin/bash
+
+/usr/bin/killall runswift
+/etc/init.d/naoqi stop
+if /usr/bin/flash-chestboard; then
+   flite -t "chest flash succeeded"
+else
+   flite -t "chest flash failed"
+fi
+if /usr/bin/flash-motorboard; then
+   flite -t "motor flash succeeded"
+else
+   flite -t "motor flash failed"
+fi
+if /usr/bin/flash-faceboard; then
+   flite -t "face flash succeeded"
+else
+   flite -t "face flash failed"
+fi
+# /usr/bin/flash-inertialboard
+/sbin/reboot

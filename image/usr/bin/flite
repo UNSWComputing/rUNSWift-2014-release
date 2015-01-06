@@ -1,0 +1,5 @@
+#! /usr/bin/python
+from naoqi import ALProxy
+import sys
+tts = ALProxy("ALTextToSpeech", "localhost", 9559)
+tts.say(sys.argv[2])

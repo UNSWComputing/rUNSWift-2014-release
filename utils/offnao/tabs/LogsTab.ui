@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LogsTab</class>
+ <widget class="QWidget" name="wLogsTab">
+  <layout class="QVBoxLayout" name="vblLogsTab">
+   <item>
+    <layout class="QHBoxLayout" name="hblControls">
+     <item>
+      <widget class="QComboBox" name="cbDirectories"/>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbLevels">
+       <item>
+        <property name="text">
+         <string>SILENT</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>QUIET</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>FATAL</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ERROR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>WARNING</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>INFO</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>VERBOSE</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>DEBUG1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>DEBUG2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>DEBUG3</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="twLogs"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

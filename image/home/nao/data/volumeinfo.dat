@@ -1,0 +1,6 @@
+set 'PCM' unmute
+set 'PCM' 48
+set 'Master Mono' unmute
+set 'Master Mono' 48
+set 'Master' unmute
+set 'Master' 48

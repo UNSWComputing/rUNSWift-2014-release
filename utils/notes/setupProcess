@@ -1,0 +1,27 @@
+Pregame:
+
+T -30:00
+  pull master
+  make clean
+  make
+
+T -20:00
+- Connect via link local
+- Change field (sudo python bin/changeField.py <FIELD_LETTER>)
+- Check that it worked: (cat /etc/wpa_supplicant/wpa_supplicant.conf | grep ssid) - should match field wifi
+- Restart wifi (sudo /etc/init.d/runswiftwireless restart)
+- Sync -dar (nao_sync -dar)
+- Nao restart (nao restart)
+- Check wifi (ifconfig | grep wlan0 -a 4): check for RUNNING
+
+- Alternatively to all the above:
+   cd $RUNSWIFT_CHECKOUT_DIR/bin/fabscripts
+   fab -H <robotname> setup_for_game:<field letter>
+   nao_sync -dar <robotname>
+   fab -H <robotname> nao_restart
+   fab -H <robotname> check_wifi
+
+Post game:
+
+- Change field back
+  fab -H <robotname> change_field

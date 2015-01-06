@@ -1,0 +1,4 @@
+#!/bin/bash
+
+make --no-print-directory -C $RUNSWIFT_CHECKOUT_DIR/build-release/
+nao_sync $1 $2

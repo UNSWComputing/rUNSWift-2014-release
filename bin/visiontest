@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+
+sub outputStat {
+   my ($key, $value) = @_;
+   print "##teamcity[buildStatisticValue key='$key' value='$value']\n";
+}
+
+exists($ENV{VISION_TEST_DIR}) or die("VISION_TEST_DIR environment variable not set, no files to test!");
+
+#outputStat("ballRecall", 0);
+#outputStat("postRecall", 0);
+#outputStat("edgeRecall", 0);
+#outputStat("lineRecall", 0);
+#outputStat("robotRecall", 0);
+#outputStat("ballPrecision", 0);
+#outputStat("postPrecision", 0);
+#outputStat("edgePrecision", 0);
+#outputStat("linePrecision", 0);
+#outputStat("robotPrecision", 0);
+#outputStat("ballRadiusError", 0);
+#outputStat("ballCenterError", 0);
+#outputStat("postWidthError", 0);
+#outputStat("postHeightError", 0);
+

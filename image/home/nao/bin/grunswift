@@ -1,0 +1,20 @@
+#!/bin/bash
+set -e
+set -u
+cat > /tmp/gdb_cmds.txt <<END
+handle SIGINT nostop
+handle SIGINT print
+handle SIGINT pass
+handle SIGTSTP stop
+handle SIGTSTP print
+handle SIGTSTP nopass
+catch throw
+set \$exitcode = -999
+run
+if \$exitcode != -999
+quit
+else
+bt full
+end
+END
+gdb -x /tmp/gdb_cmds.txt --return-child-result --quiet --args `which runswift` $@

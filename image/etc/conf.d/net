@@ -1,0 +1,15 @@
+# This blank configuration will automatically use DHCP for any net.*
+# scripts in /etc/init.d.  To create a more complete configuration,
+# please review /usr/share/doc/openrc*/net.example* and save your configuration
+# in /etc/conf.d/net (this file :]!).
+
+# Runswift Note: Copied from networking info on Gentoo:
+# https://www.gentoo.org/doc/en/handbook/handbook-x86.xml?part=4&chap=2
+
+# Keep our kernel assigned address, unless the interface goes
+# down so assign another via DHCP. If DHCP fails then add a
+# static address determined by APIPA
+config_eth0="noop
+dhcp"
+fallback_eth0="null
+apipa"

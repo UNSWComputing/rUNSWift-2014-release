@@ -1,0 +1,238 @@
+#!/bin/bash
+
+if [ $1 == "status" ]
+then
+   for name in robot1 robot2
+   do
+      printf "$name\t"
+      if ssh -o BatchMode=yes -o StrictHostKeyChecking=no nao@$name.local touch /dev/null 2> /dev/null
+      then
+         printf "Connected."
+      else
+         printf "Can't connect!"
+      fi
+      echo
+   done
+
+   exit
+fi
+
+set -e # bail out when something goes wrong rather than screwing up the nao
+set -u
+
+FALSE=1
+TRUE=0
+
+usage() {
+   echo -e "nao_sync: Synchronise robot with image directory in repository"
+   echo -e "Usage: $0 robot -s"
+   echo -e "Usage: $0 robot [-ardx] [-b build_directory]"
+   echo -e
+   echo -e "Options:"
+   echo -e "\trobot:\tName of target robot, without .local (eg. demoman)"
+   echo -e "\t-a:\tUpload libagent. Disabled by default"
+   echo -e "\t-b:\tUpload from build_directory"
+   echo -e "\t-r:\tUpload runswift. Disabled by default"
+   echo -e "\t-s:\tSetup ssh config. Disabled by default"
+   echo -e "\t-d:\tDelete contents of ~nao. Disabled by default"
+   echo -e "\t-x:\tDon't sync image directory. Disabled by default"
+   exit 1
+}
+
+function sync_runswift() {
+   if [ -f "$build/robot/runswift" ]; then
+      rsync -rlptP -e "$RSYNC_SSH -l nao" $build/robot/runswift $robot:/home/nao/bin/
+   else
+      echo "runswift does not exist!"
+   fi
+}
+
+function sync_libagent() {
+   if [ -f "$build/robot/libagent.so" ]; then
+      $RSYNC_SSH nao@$robot mkdir -p naoqi/lib/naoqi
+      rsync -rlptP -e "$RSYNC_SSH -l nao" $build/robot/libagent.so $robot:/home/nao/naoqi/lib/naoqi/
+   else
+      echo "libagent does not exist!"
+   fi
+}
+
+function sync_image() {
+   cat $RUNSWIFT_CHECKOUT_DIR/image/home/nao/.ssh/authorized_keys | $RSYNC_SSH nao@$robot "umask 077; mkdir -p .ssh ; cat > .ssh/authorized_keys"
+   # cat $RUNSWIFT_CHECKOUT_DIR/image/home/nao/.ssh/authorized_keys | $RSYNC_SSH nao@$robot "umask 077; mkdir -p /root/.ssh; cat > /root/.ssh/authorized_keys" 
+
+   # we dont want to decompress the nnmc files on every nao sync as it would result in a
+   # substancial increase in sync time. Instead, do a make like trick and compare timestamps.
+
+   for cal in $RUNSWIFT_CHECKOUT_DIR/image/home/nao/data/*.nnmc.bz2
+   do
+      nnmc_file=${cal%\.bz2}
+      decompress=""
+      if test ! -f $nnmc_file
+      then
+         decompress=1
+      else
+         newer=`perl -e '$m_bz2 = (stat $ARGV[0])[9];
+                         $m_pln = (stat $ARGV[1])[9];
+                         print $m_bz2 > $m_pln;' $cal $nnmc_file`
+         if test $newer
+         then
+            decompress=1
+         fi
+      fi
+      if test "$decompress"
+      then
+         rm -f $nnmc_file
+         echo "Decompressing $cal"
+         bunzip2 -k $cal
+      fi
+   done
+
+   rsync -rlptP --chmod go= $del -e "$RSYNC_SSH -l nao" --exclude='*.nnmc.bz2' $RUNSWIFT_CHECKOUT_DIR/image/home/nao $robot:/home/
+}
+
+# Try to autodetect whether we are on the same subnet as the robots or
+# whether we need to tunnel through roborouter
+RSYNC_SSH="ssh -o ControlMaster=auto -o ControlPath=/tmp/control_%l_%h_%p_%r"
+
+# Find the runswift checkout dir
+if [ ! -d "$RUNSWIFT_CHECKOUT_DIR" -o ! -d "$RUNSWIFT_CHECKOUT_DIR/image" ]; then
+   echo "Image directory not found! Set your RUNSWIFT_CHECKOUT_DIR"
+   exit 1
+fi
+
+# Process args. If more than one robot is supplied, only the last one is used
+robot=""
+agent=$FALSE
+runswift=$FALSE
+setup=$FALSE
+delete=$FALSE
+image=$TRUE
+build="$RUNSWIFT_CHECKOUT_DIR/build-release"
+
+while getopts ":xrasdb:" opt; do
+   case $opt in
+      x)   image=$FALSE
+            ;;
+      r)   runswift=$TRUE
+            ;;
+      a)   agent=$TRUE
+            ;;
+      s)   setup=$TRUE
+            ;;
+      d)   delete=$TRUE
+            ;;
+      b)   build="$OPTARG"
+            ;;
+      \?)   usage
+            ;;
+   esac
+done
+
+if [[ ! -d "$build" ]]; then
+   echo "Build directory $build does not exist" >&2
+   exit $LINENO
+fi
+
+case ${!OPTIND} in
+   robot1|robot2)
+         robot=${!OPTIND}.local
+         ;;
+   *)    robot=${!OPTIND}
+         ;;
+esac
+
+if [ "$robot" = "" ]; then
+   usage
+fi
+
+if [ $delete -eq $TRUE ]; then
+   del='--del'
+else
+   del=
+fi
+
+# SSH control connection
+#$RSYNC_SSH -N nao@$robot
+#CONTROL=$!
+#trap "{ kill $CONTROL; }" EXIT
+
+# Sync with the robot
+if [ $setup -eq $TRUE ]; then
+   if [ -e ~/.ssh/id_rsa.pub ]; then
+      echo "Adding your ~/.ssh/id_rsa.pub to /home/nao/.ssh/authorized_keys"
+      echo "If prompted echo nao's password"
+      cat ~/.ssh/id_rsa.pub | $RSYNC_SSH -l nao $robot "mkdir -p .ssh; sh -c 'cat >> .ssh/authorized_keys'; chmod 700 .ssh; chmod 600 .ssh/authorized_keys "
+      no_idpub=
+   else
+      echo "~/.ssh/id_rsa.pub does not exist. You will need to enter nao's password each time"
+      no_idpub="nao's password and then "
+   fi
+
+   echo "Granting sudo access: Enter ${no_idpub}root password (probably 'root')"
+   $RSYNC_SSH -t -l nao $robot "su -c 'tee /etc/sudoers <<< \"nao     ALL=(ALL) NOPASSWD:ALL\" && chmod 0440 /etc/sudoers'"
+   echo "Modifying sshd_config and restarting sshd"
+   $RSYNC_SSH -t -l nao $robot "sudo sed -i '/UseDNS/s/.*/UseDNS no/' /etc/ssh.conf/sshd_config &&
+                                sudo sed -i /PermitRootLogin/s/no/yes/ /etc/ssh.conf/sshd_config &&
+                                sudo /etc/init.d/sshd stop && sudo /etc/init.d/sshd start"
+
+   echo "Uploading root authorized keys"
+   $RSYNC_SSH nao@$robot "umask 077 && sudo mkdir -p /root/.ssh && sudo tee /root/.ssh/authorized_keys" < $RUNSWIFT_CHECKOUT_DIR/image/home/nao/.ssh/authorized_keys
+
+   # Something wrong with these lines... deletes /home/nao
+   echo "Syncing root directory"
+   rsync -rlptP -e "$RSYNC_SSH -l root" --exclude=home $RUNSWIFT_CHECKOUT_DIR/image/ $robot:/
+
+   # Add any missing libraries for future builds here
+   echo "Copying across missing libraries"
+   pushd $CTC_DIR/sysroot/usr/lib/
+   rsync -rlptP -e "$RSYNC_SSH -l root" --include="libboost_python*" --exclude="*" . $robot:/usr/lib
+   popd
+
+   echo "Creating symlink"
+   $RSYNC_SSH root@$robot "ln -sf /lib/libbz2.so.1 /lib/libbz2.so.1.0"
+
+   echo "Setting up networking"
+   $RSYNC_SSH root@$robot "ln -sf /etc/init.d/net.lo /etc/init.d/net.eth0"
+   $RSYNC_SSH root@$robot "rc-update add net.eth0 default"
+   $RSYNC_SSH root@$robot "rc-update add runswiftwireless default"
+   $RSYNC_SSH root@$robot "rc-update del connman boot"
+
+   echo "Setup finished!"
+   exit 0
+fi
+
+   # These were from testing.
+
+   # echo "Setting default volume to low"
+   # $RSYNC_SSH root@$robot "amixer sset 'PCM',0 20%"
+   # $RSYNC_SSH root@$robot "alsactl store"
+
+   # echo "Running runswift executable on the robot"
+   # $RSYNC_SSH root@$robot "/home/nao/bin/runswift > /dev/null 2> /dev/null &" &
+
+   # sleep 2
+
+   # echo "Restarting the robot (ignore any \"crash detected\" and \"exception caught\")"
+   # $RSYNC_SSH root@$robot "reboot"
+   # echo
+
+
+if [ $image -eq $TRUE ]; then
+   echo "Syncing image"
+   sync_image
+fi
+
+if [ $agent -eq $TRUE ]; then
+   echo "Syncing libagent"
+   sync_libagent
+fi
+
+if [ $runswift -eq $TRUE ]; then
+   echo "Syncing runswift"
+   sync_runswift
+fi
+
+echo "Finished!"
+echo
+
+exit 0

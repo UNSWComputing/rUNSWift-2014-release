@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConnectionBar</class>
+ <widget class="QDockWidget" name="ConnectionBar">
+  <property name="allowedAreas">
+   <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
+  </property>
+  <property name="windowTitle">
+   <string>Connect to ...</string>
+  </property>
+  <widget class="QWidget" name="connectionBarContents">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="margin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QComboBox" name="cbHost">
+      <property name="toolTip">
+       <string>Hostname or IP to connect to</string>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string>husker.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>apollo.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>athena.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>helo.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>hotdog.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>starbuck.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mario.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>luigi.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>peach.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>bowser.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>yoshi.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>toad.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>boomer.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>hunter.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>smoker.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>tank.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>witch.local</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>localhost</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbBlackboard">
+      <property name="toolTip">
+       <string>Blackboard</string>
+      </property>
+      <property name="text">
+       <string>&amp;Blackboard</string>
+      </property>
+      <property name="shortcut">
+       <string>Alt+B</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string>bgMasks</string>
+      </attribute>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbSaliency">
+      <property name="toolTip">
+       <string>Saliency Scan</string>
+      </property>
+      <property name="text">
+       <string>&amp;Saliency Scan</string>
+      </property>
+      <property name="shortcut">
+       <string>Alt+S</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string>bgMasks</string>
+      </attribute>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbRaw">
+      <property name="toolTip">
+       <string>Raw Image</string>
+      </property>
+      <property name="text">
+       <string>&amp;Raw Image</string>
+      </property>
+      <property name="shortcut">
+       <string>Alt+R</string>
+      </property>
+      <attribute name="buttonGroup">
+       <string>bgMasks</string>
+      </attribute>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbParticles">
+      <property name="text">
+       <string>&amp;Particles</string>
+      </property>
+      <property name="shortcut">
+       <string>Alt+P</string>
+      </property>
+      <property name="checked">
+         <bool>true</bool>
+      </property>
+      <attribute name="buttonGroup">
+       <string>bgMasks</string>
+      </attribute>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbRobotFilter">
+        <property name="text">
+           <string>&amp;Robot Filter</string>
+        </property>
+        <property name="shortcut">
+           <string>Alt+F</string>
+        </property>
+        <property name="checked">
+           <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+           <string>bgMasks</string>
+        </attribute>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbLandmarks">
+        <property name="text">
+           <string>&amp;Landmarks</string>
+        </property>
+        <property name="shortcut">
+           <string>Alt+F</string>
+        </property>
+        <attribute name="buttonGroup">
+           <string>bgMasks</string>
+        </attribute>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="bgMasks">
+   <property name="exclusive">
+    <bool>false</bool>
+   </property>
+  </buttongroup>
+ </buttongroups>
+</ui>

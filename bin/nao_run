@@ -1,0 +1,75 @@
+#!/bin/bash
+set -e
+set -u
+
+declare -A short_options
+short_options[h]=say_hello
+short_options[i]=ifconfig
+short_options[r]=nao_restart
+
+declare -A aliases
+aliases[say_hello]="/usr/bin/flite -t hello"
+aliases[nao_restart]='sudo /etc/init.d/naoqi restart' # not 'nao restart'?
+
+list_short_options() {
+  for short_option in "${!short_options[@]}"; do
+    echo -n "-$short_option | "
+  done
+}
+
+list_aliases() {
+  for alias in "${!aliases[@]}"; do
+    echo -n "$alias | "
+  done
+}
+
+describe_short_options() {
+  for short_option in "${!short_options[@]}"; do
+    echo "-$short_option	${short_options[$short_option]}"
+  done
+}
+
+describe_aliases() {
+  for alias in "${!aliases[@]}"; do
+    echo "$alias	${aliases[$alias]}"
+  done
+}
+
+get_short_options() {
+  for short_option in "${!short_options[@]}"; do
+    echo -n "$short_option"
+  done
+}
+
+usage="$0 {$(list_short_options) | $(list_aliases) | 'command' } robot1 robot2...
+$(describe_short_options)
+$(describe_aliases)"
+
+alias=
+
+while getopts "$(get_short_options)" options; do
+  case $options in
+    [$(get_short_options)] ) alias="${short_options[$options]}" ;;
+    \? ) echo "$usage"                         >&2
+         exit $LINENO                          ;;
+    : )  echo "$usage"                         >&2
+         echo "-$OPTARG requires an argument." >&2
+         exit $LINENO                          ;;
+    * )  echo "$usage"                         >&2
+         echo "No $options"                    >&2
+         exit $LINENO                          ;;
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [[ x"$alias" == x ]]; then
+  command="$1"
+  shift
+else
+  command="${aliases[$alias]:-$alias}"
+fi
+
+for robot in "$@"; do
+  ssh -t $robot "$command"
+done

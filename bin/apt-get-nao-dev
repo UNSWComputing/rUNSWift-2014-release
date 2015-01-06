@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+
+use File::Basename;
+use File::Path qw(make_path);
+
+unless (exists($ENV{CTC_DIR})) {
+   $ENV{CTC_DIR} = '/home/robocup/2011/nao-cross-toolchain-1.10.25';
+}
+$ENV{CTC_ADDONS_DIR} = $ENV{CTC_DIR} . '/staging/geode-linux/addons/';
+
+make_path("$ENV{CTC_ADDONS_DIR}/etc/apt/sources.list.d");
+if (open(APT_SOURCES_LIST,">$ENV{CTC_ADDONS_DIR}/etc/apt/sources.list.d/runswift.list")) {
+  print APT_SOURCES_LIST "deb http://runswift.cse.unsw.edu.au/opennao/repo-1.10.21 1.10.21 main contrib non-free";
+  close(APT_SOURCES_LIST);
+}
+make_path("$ENV{CTC_ADDONS_DIR}/var/lib/apt/lists/partial");
+make_path("$ENV{CTC_ADDONS_DIR}/var/cache/apt/archives/partial");
+make_path("$ENV{CTC_ADDONS_DIR}/var/lib/dpkg");
+unless (-w "$ENV{CTC_ADDONS_DIR}/var/lib/dpkg/status") {
+ open(TEMP, ">$ENV{CTC_ADDONS_DIR}/var/lib/dpkg/status");
+ close(TEMP);
+}
+make_path("$ENV{CTC_ADDONS_DIR}/etc/apt/preferences.d");
+make_path("$ENV{CTC_ADDONS_DIR}/usr/lib");
+symlink('/usr/lib/apt',"$ENV{CTC_ADDONS_DIR}/usr/lib/apt");
+@before_download = (<$ENV{CTC_ADDONS_DIR}/var/cache/apt/archives/*_*_i386.deb>, <$ENV{CTC_ADDONS_DIR}/var/cache/apt/archives/*_*_all.deb>);
+system('apt-get','-y','--allow-unauthenticated','-d','-o','APT::Architecture=i386','-o','Debug::NoLocking=True','-o',"RootDir=$ENV{CTC_ADDONS_DIR}",'-o','Dir::State::status=/var/lib/dpkg/status',@ARGV);
+@after_download = (<$ENV{CTC_ADDONS_DIR}/var/cache/apt/archives/*_*_i386.deb>, <$ENV{CTC_ADDONS_DIR}/var/cache/apt/archives/*_*_all.deb>);
+%download_difference = ();
+@download_difference{@after_download} = ();
+foreach (@before_download) {
+  delete $download_difference{$_};
+}
+make_path("$ENV{CTC_ADDONS_DIR}/var/lib/dpkg/updates/");
+unless (-w "$ENV{CTC_ADDONS_DIR}/var/lib/dpkg/available") {
+  open(TEMP, ">$ENV{CTC_ADDONS_DIR}/var/lib/dpkg/available");
+  close(TEMP);
+}
+$ENV{PATH} .= ':/sbin:/usr/sbin:/usr/local/sbin';
+make_path("$ENV{CTC_ADDONS_DIR}/var/lib/dpkg/info/");
+@dpkg_cmd = ('fakeroot','dpkg',"--root=$ENV{CTC_ADDONS_DIR}",'--force-depends','--force-architecture');
+if (grep(/install/, @ARGV)) {
+  die "No files were downloaded.  Try cleaning $ENV{CTC_ADDONS_DIR}/var/cache/apt/archives" unless %download_difference;
+  exec(@dpkg_cmd,'--unpack',keys %download_difference);
+} elsif (grep(/remove/, @ARGV)) {
+  @ARGV = grep(!/remove/, @ARGV);
+  exec(@dpkg_cmd,'-r',@ARGV);
+} elsif (grep(/purge/, @ARGV)) {
+  @ARGV = grep(!/purge/, @ARGV);
+  exec(@dpkg_cmd,'-P',@ARGV);
+}

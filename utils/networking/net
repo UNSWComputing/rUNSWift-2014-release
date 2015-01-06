@@ -1,0 +1,16 @@
+# wired static IP
+# Change the config_eth0 to suit the robot
+config_eth0="192.168.69.203 netmask 255.255.255.0"
+routes_eth0="default via 192.168.69.1"
+
+# wireless
+# prefer wpa_supplicant over wireless-tools
+modules="wpa_supplicant"
+#need to tell it what driver to use
+wpa_supplicant_wlan0=""
+
+# wireless upenn robocup router
+# Change the config_eth0 to suit the robot
+config_wlan0="192.168.20.203 netmask 255.255.0.0"
+routes_wlan0="default via 192.168.0.1"
+

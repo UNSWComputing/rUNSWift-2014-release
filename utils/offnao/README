@@ -1,0 +1,16 @@
+Welcome to Off-Nao, the rUNSWift debugging toolsuite.
+
+To build this project, you need Qt4.
+
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ ./offnao
+
+Once you have performed the steps above once, in future you only need to:
+
+$ make
+$ ./offnao
+
+In the 'build' directory
