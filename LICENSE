@@ -26,3 +26,11 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this source code; if not, write to the Free Software Foundation,
 Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ 
+If this code release, or any part of it, is used in a Robocup competition,
+the usage should be announced to the SPL teams mailing list one month
+before the start of the competition. The announcement should outline
+which parts of the code release are being used and the contributions
+that the team has made to the system. It is expected that any team that
+uses this code release as part of a Robocup entry will also strive to
+make their own significant contributions to the Robocup goal.
